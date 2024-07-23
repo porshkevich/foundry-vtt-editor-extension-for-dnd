@@ -1,0 +1,12 @@
+{
+	"EEFDND": {
+		"WorkOnly": "Editor extension work only for <b>DnD5e</b> system",
+		"AddEnricher": "Add {enricher}",
+		"SelectedValue": "Selected text",
+		"LongFormat": "Long Format",
+		"EnricherInsert": "Enricher Insert",
+		"WrapSelected": "Wrap Selected",
+		"Options": "Options",
+		"Average": "Average"
+	}
+}

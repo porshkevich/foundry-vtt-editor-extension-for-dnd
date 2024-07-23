@@ -1,0 +1,45 @@
+<form>
+    <div class="form-group {{#if (not selected)}}hidden{{/if}}">
+        <label>{{localize "EEFDND.SelectedValue"}}</label>
+        <div class="form-fields">
+            <input type="text" name="old" value="{{selected}}" {{disabled}}>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>{{localize "DND5E.Skill"}}</label>
+        <div class="form-fields">
+            <select name="skill">
+                {{selectOptions skillChoices sort=true}}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>{{localize "DND5E.Ability"}}</label>
+        <div class="form-fields">
+            <select name="ability">
+                {{selectOptions abilityChoices sort=true}}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>{{localize "DND5E.VsDC"}}</label>
+        <div class="form-fields">
+            {{numberInput "" name="dc"}}
+        </div>
+    </div>
+    <div class="form-group">
+        <label>{{localize "EEFDND.Options"}}</label>
+        <div class="form-fields">
+            <label class="checkbox">{{localize "DND5E.Passive"}}
+                <input name="passive" type="checkbox" value="passive">
+            </label>
+            <label class="checkbox">{{localize "EEFDND.WrapSelected"}}
+                <input name="wrap" type="checkbox" value="true">
+            </label>
+            <label class="checkbox">{{localize "EEFDND.LongFormat"}}
+                <input name="format" type="checkbox" value="long">
+            </label>
+        </div>
+    </div>
+    <button type="button" name="save">{{localize "EEFDND.EnricherInsert"}}</button>
+</form>

@@ -1,0 +1,41 @@
+{
+	"id": "editor-extension-for-dnd",
+	"name": "editor-extension-for-dnd",
+	"title": "Editor extension for DnD5e",
+	"description": "Модуль добавляет в редактор в системе Dungeons & Dragons 5 дополнительный набор диалогов для вставки Декораторов/Обогатителей/Enrichers предоставляемых системой",
+	"version": "#{VERSION}#",
+	"library": "false",
+	"compatibility": {
+		"minimum": "11",
+		"verified": "12",
+		"maximum": "12"
+	},
+	"authors": [
+		{
+			"name": "NeoSonic",
+			"discord": "neosonic",
+			"email": "neosonic@inbox.ru",
+			"url": "https://github.com/porshkevich"
+		}
+	],
+	"esmodules": [
+		"/scripts/module.js"
+	],
+	"languages": [
+		{
+			"lang": "ru",
+			"name": "Русский",
+			"path": "lang/ru.json"
+		},
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "lang/en.json"
+		}
+	],
+	"url": "#{URL}#",
+	"manifest": "#{MANIFEST}#",
+	"download": "#{DOWNLOAD}#",
+	"license": "LICENSE",
+	"readme": "README.md"
+}

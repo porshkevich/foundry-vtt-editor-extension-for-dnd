@@ -1,0 +1,12 @@
+{
+	"EEFDND": {
+		"WorkOnly": "Расширение редактора работает только для системы <b>DnD5e</b>",
+		"AddEnricher": "{enricher}",
+		"SelectedValue": "Выделенный текст",
+		"LongFormat": "Расширенный формат",
+		"EnricherInsert": "Вставка",
+		"WrapSelected": "Обернуть",
+		"Options": "Опции",
+		"Average": "Среднее"
+	}
+}
