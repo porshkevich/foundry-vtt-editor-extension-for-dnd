@@ -406,12 +406,9 @@ class EditorEnrichersExtension {
 
 	static _getSelectedText(pmmenu) {
 		const state = pmmenu.view.state;
-		const { $from, empty } = state.selection;
-		if (!empty) {
-			const selected = state.doc.nodeAt($from.pos);
-			return selected?.text ?? "";
-		}
-		return "";
+		const { from, to, empty } = state.selection;
+
+		return !empty ? state.doc.textBetween(from, to) ?? "" : ""
 	}
 
 	static _getAbilityChoices() {
