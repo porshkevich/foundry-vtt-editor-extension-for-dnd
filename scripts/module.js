@@ -17,7 +17,7 @@ Hooks.once("init", async () => {
 	const extension = new EditorEnrichersExtension();
 
 	Hooks.on("getProseMirrorMenuDropDowns", (pmmenu, menus) => {
-		return extension.registerNewProseMirrorMenuDropDowns(pmmenu, menus);
+		extension.registerNewProseMirrorMenuDropDowns(pmmenu, menus);
 	});
 
 	extension.registerHandlebarsHelpers();
@@ -134,7 +134,6 @@ class EditorEnrichersExtension {
 				},
 			],
 		};
-		return menus;
 	}
 
 	async _insertCheckPrompt(pmmenu) {
