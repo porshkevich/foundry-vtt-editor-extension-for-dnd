@@ -20,7 +20,19 @@ Hooks.once("init", async () => {
 		extension.registerNewProseMirrorMenuDropDowns(pmmenu, menus);
 	});
 
+	Hooks.on("getProseMirrorMenuItems", (pmmenu, items) => {
+		extension.registerNewProseMirrorMenuItems(pmmenu, items);
+	});
+
 	extension.registerHandlebarsHelpers();
+
+	if (libWrapper != undefined) {
+		libWrapper.register('editor-extension-for-dnd', 'JournalPageSheet.defaultOptions', function (wrapped, ...args) {
+			return foundry.utils.mergeObject(wrapped(), {
+				width: 630
+			})
+		} );
+	}
 });
 
 function concat_notnull(...values) {
@@ -35,6 +47,15 @@ const i18n = (key) => {
 const i18nFormat = (key, data = {}) => {
 	return game.i18n.format(key, data);
 };
+const toggleCase = (text) => {
+	return [...text].map(function(current, index, stringArray) {
+		if (current.toLowerCase() === current) {
+			return current.toUpperCase(); // If a character is lowercase, switch to uppercase
+		} else {
+			return current.toLowerCase(); // Else, switch to lowercase
+		}
+	}).join('');
+}
 
 class EditorEnrichersExtension {
 	static get OUTPUT_TEMPLATES() {
@@ -452,5 +473,56 @@ class EditorEnrichersExtension {
 
 	static _getSpellSchoolChoices() {
 		return lib.mapObject(CONFIG.DND5E.spellSchools, lib.mapByLabel);
+	}
+
+	registerNewProseMirrorMenuItems(pmmenu, items) {
+		const scopes = pmmenu.constructor._MENU_ITEM_SCOPES;
+		items.unshift(
+			{
+				action: "toogleCase",
+				title: i18n("EEFDND.ToggleCase"),
+				icon: '<i class="fa-solid fa-font-case"></i>',
+				scope: scopes.TEXT,
+				cmd: this._toggleCase.bind(this, pmmenu)
+			}
+		);
+	}
+
+	async _toggleCase(pmmenu) {
+		const state = pmmenu.view.state
+		let tr = state.tr;
+		const selection = tr.selection;
+		if (selection.empty)
+			return
+
+		// check we will actually need a to dispatch transaction
+		let shouldUpdate = false;
+
+		state.doc.nodesBetween(selection.from, selection.to, (node, position) => {
+			// we only processing text, must be a selection
+			if (!node.isText || selection.from === selection.to) return;
+
+			// calculate the section to replace
+			const startPosition = Math.max(position, selection.from);
+			const endPosition = Math.min(position + node.nodeSize, selection.to);
+
+			// grab the content
+			const substringFrom = Math.max(0, selection.from - position);
+			const substringTo = Math.max(0, selection.to - position);
+			const updatedText = node.textContent.substring(substringFrom, substringTo);
+
+			// replace
+			tr = tr.insertText(toggleCase(updatedText), startPosition, endPosition)
+			shouldUpdate = true;
+		});
+
+		if (shouldUpdate) {
+			tr.setSelection(selection.map(tr.doc, tr.mapping))
+			pmmenu.view.dispatch(tr.scrollIntoView());
+			// Hack for bad work prosemirror and dom selection
+			const {node: anchorNode, offset: anchorOffset} = pmmenu.view.domAtPos(selection.from)
+			const {node: focusNode, offset: focusOffset} = pmmenu.view.domAtPos(selection.to)
+			document.getSelection().setBaseAndExtent(anchorNode, anchorOffset, focusNode, focusOffset)
+		}
 	}
 }
