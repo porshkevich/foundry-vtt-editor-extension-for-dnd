@@ -1,5 +1,10 @@
 # Change Log
 
+## Version 0.2.0
+
+- Add toggleCase button to editor menu
+
+
 ## Version 0.1.1
 
 - Fix problem with text selection
