@@ -8,6 +8,12 @@
 		"WrapSelected": "Wrap Selected",
 		"Options": "Options",
 		"Average": "Average",
-		"ToggleCase": "Toggle Case"
+		"ToggleCase": "Toggle Case",
+		"settings": {
+			"displayFallbackHelpers": {
+				"name": "Display translate helpers in some drop-down menus",
+				"hint": "Adds original names (in English) of statuses, schools of magic, damage types, tools"
+			}
+		}
 	}
 }

@@ -14,7 +14,21 @@ Hooks.once("init", async () => {
 		return;
 	}
 
-	const extension = new EditorEnrichersExtension();
+	/* Настройка отображения подсказок на английском */
+	game.settings.register("editor-extension-for-dnd", "displayFallbackHelpers", {
+		name: i18n("EEFDND.settings.displayFallbackHelpers.name"),
+		hint: i18n("EEFDND.settings.displayFallbackHelpers.hint"),
+		type: Boolean,
+		default: false,
+		scope: "world",
+		config: true,
+		restricted: false,
+		requiresReload: true
+	});
+
+	const extension = new EditorEnrichersExtension(
+		game.settings.get("editor-extension-for-dnd", "displayFallbackHelpers")
+	);
 
 	Hooks.on("getProseMirrorMenuDropDowns", (pmmenu, menus) => {
 		extension.registerNewProseMirrorMenuDropDowns(pmmenu, menus);
@@ -33,6 +47,10 @@ Hooks.once("init", async () => {
 			})
 		} );
 	}
+
+	Hooks.on(game.babele ? "babele.ready" : "ready", () => {
+		extension.onReady()
+	});
 });
 
 function concat_notnull(...values) {
@@ -58,6 +76,20 @@ const toggleCase = (text) => {
 }
 
 class EditorEnrichersExtension {
+
+	constructor(displayFallbackHelpers) {
+		this._displayFallbackHelpers = displayFallbackHelpers
+	}
+
+	async onReady() {
+		this._toolChoises = await game.system.documents.Trait.choices("tool")
+		if (this.displayFallbackHelpers) lib.extendLabels(this._toolChoises)
+	}
+
+	get displayFallbackHelpers()  {
+		return this._displayFallbackHelpers && game.i18n.lang !== "en"
+	}
+
 	static get OUTPUT_TEMPLATES() {
 		return {
 			check: Handlebars.compile(
@@ -275,7 +307,7 @@ class EditorEnrichersExtension {
 		const data = {
 			selected: selectedText,
 			abilityChoices: EditorEnrichersExtension._getAbilityChoices(),
-			toolChoices: EditorEnrichersExtension._getToolChoices(),
+			toolChoices: this._getToolChoices(),
 		};
 		const dialog = await pmmenu._showDialog(
 			"enrichers-tool",
@@ -313,7 +345,7 @@ class EditorEnrichersExtension {
 		const data = {
 			selected: selectedText,
 			damageTypeChoices:
-				EditorEnrichersExtension._getDamageTypeChoicesWithEmpty(),
+				this._getDamageTypeChoicesWithEmpty(),
 		};
 		const dialog = await pmmenu._showDialog(
 			"enrichers-damage",
@@ -378,7 +410,7 @@ class EditorEnrichersExtension {
 			pmmenu,
 			"enrichers-condition",
 			"DND5E.Rule.Type.Condition",
-			EditorEnrichersExtension._getConditionChoices(),
+			this._getConditionChoices(),
 		);
 	}
 
@@ -387,7 +419,7 @@ class EditorEnrichersExtension {
 			pmmenu,
 			"enrichers-spellSchool",
 			"DND5E.SpellSchool",
-			EditorEnrichersExtension._getSpellSchoolChoices(),
+			this._getSpellSchoolChoices(),
 		);
 	}
 
@@ -446,33 +478,36 @@ class EditorEnrichersExtension {
 		return lib.mapObject(CONFIG.DND5E.skills, lib.mapByLabel);
 	}
 
-	static _getToolChoices() {
-		return lib.mapObject(CONFIG.DND5E.toolIds, ([k, v]) => [
-			k,
-			lib.getBaseItem(v).name,
-		]);
+	_getToolChoices() {
+		return this._toolChoises
 	}
 
-	static _getDamageTypeChoices() {
-		return lib.mapObject(CONFIG.DND5E.damageTypes, lib.mapByLabel);
+	_getDamageTypeChoices() {
+		return lib.mapObject(
+			CONFIG.DND5E.damageTypes,
+			this.displayFallbackHelpers ? lib.mapByLabelConcatKey : lib.mapByLabel
+		);
 	}
 
-	static _getDamageTypeChoicesWithEmpty() {
+	_getDamageTypeChoicesWithEmpty() {
 		return Object.assign(
 			{ "": "" },
-			EditorEnrichersExtension._getDamageTypeChoices(),
+			this._getDamageTypeChoices(),
 		);
 	}
 
-	static _getConditionChoices() {
+	_getConditionChoices() {
 		return lib.mapObject(
 			lib.filterObject(CONFIG.DND5E.conditionTypes, lib.filterByReferenceExist),
-			lib.mapByLabel,
+			this.displayFallbackHelpers ? lib.mapByLabelConcatKey : lib.mapByLabel,
 		);
 	}
 
-	static _getSpellSchoolChoices() {
-		return lib.mapObject(CONFIG.DND5E.spellSchools, lib.mapByLabel);
+	_getSpellSchoolChoices() {
+		return lib.mapObject(
+			CONFIG.DND5E.spellSchools,
+			this.displayFallbackHelpers ? lib.mapByLabelConcatFullKey : lib.mapByLabel,
+		);
 	}
 
 	registerNewProseMirrorMenuItems(pmmenu, items) {
